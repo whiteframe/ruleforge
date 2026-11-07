@@ -1,10 +1,14 @@
-import json, pathlib, sys
+"""Unit tests: every rule must match its match/ fixtures and none of its no_match/ ones."""
+import json
+import pathlib
+import sys
+
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
-from common import rule_files, load_rule
-from matcher import rule_matches
+from common import rule_files, load_rule  # noqa: E402
+from matcher import rule_matches, sql_for  # noqa: E402
 
 
 def cases():
@@ -19,6 +23,11 @@ def cases():
 
 @pytest.mark.parametrize("rule,fixture,expected", list(cases()))
 def test_fixture(rule, fixture, expected):
-    event = json.loads(fixture.read_text())
+    event = json.loads(fixture.read_text(encoding="utf-8"))
     assert rule_matches(rule, event) == expected, (
-        f"{rule.name} {'should' if expected else 'should NOT'} match {fixture.name}")
+        f"{rule.name} {'should' if expected else 'should NOT'} match {fixture.name}\n"
+        f"SQL: {sql_for(str(rule))}")
+
+
+def test_every_rule_has_fixtures():
+    assert list(cases()), "No fixtures found; add tests/fixtures/RF-NNN/{match,no_match}/*.json"

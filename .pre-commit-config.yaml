@@ -1,9 +1,26 @@
+# RuleForge pre-commit hooks (Build Guide step 5.4)
+#
+# Runs before every `git commit` when a rule or fixture changed, and blocks the
+# commit if a check fails. Both hooks use the project's own virtual environment,
+# so nothing is downloaded.
+#
+# Install once:   .venv/bin/pre-commit install
+# Run by hand:    .venv/bin/pre-commit run --all-files
+# Skip once:      git commit --no-verify   (CI still runs the same checks)
+
 repos:
   - repo: local
     hooks:
       - id: ruleforge-lint
-        name: RuleForge lint
+        name: RuleForge lint (rule standard)
         entry: .venv/bin/python tools/lint_rules.py
         language: system
         pass_filenames: false
-        files: ^rules/
+        files: ^(rules|tests/fixtures)/
+
+      - id: ruleforge-unit-tests
+        name: RuleForge unit tests (fixtures)
+        entry: .venv/bin/python -m pytest -q tests
+        language: system
+        pass_filenames: false
+        files: ^(rules|tests|tools)/
