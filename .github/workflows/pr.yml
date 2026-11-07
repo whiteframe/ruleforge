@@ -1,0 +1,60 @@
+name: RuleForge PR checks
+on: pull_request
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:9.2.4
+        env:
+          discovery.type: single-node
+          xpack.security.enabled: "false"
+          ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+        ports: ["9200:9200"]
+        options: >-
+          --health-cmd "curl -s http://localhost:9200/_cluster/health | grep -qE 'green|yellow'"
+          --health-interval 10s --health-retries 30
+    env:
+      ES_URL: http://localhost:9200
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt
+      - name: Lint
+        run: python tools/lint_rules.py
+      - name: Unit tests
+        run: python -m pytest -q tests
+      - name: Load datasets
+        run: python tools/load_datasets.py
+      - name: Score this branch
+        run: python tools/evaluate.py --out results/head.json
+      - name: Score main on the same data
+        run: |
+          git worktree add /tmp/base origin/${{ github.base_ref }}
+          (cd /tmp/base && python tools/evaluate.py --out results/base.json) || true
+          cp /tmp/base/results/base.json results/base.json 2>/dev/null || echo '{"rules": []}' > results/base.json
+      - name: Compare and gate
+        id: gate
+        continue-on-error: true
+        run: python tools/compare.py results/base.json results/head.json --comment results/pr_comment.md
+      - name: Coverage layer
+        run: python tools/coverage.py results/head.json --out results/coverage_layer.json
+      - name: Convert to other backends
+        run: python tools/convert.py --out results/converted
+      - name: Post PR comment
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          PR=${{ github.event.pull_request.number }}
+          gh pr comment $PR --body-file results/pr_comment.md --edit-last \
+            || gh pr comment $PR --body-file results/pr_comment.md
+      - uses: actions/upload-artifact@v4
+        with: { name: ruleforge-results, path: results/ }
+      - name: Fail if a gate failed
+        if: steps.gate.outcome == 'failure'
+        run: exit 1

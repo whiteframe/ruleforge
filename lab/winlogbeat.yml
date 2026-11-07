@@ -1,0 +1,15 @@
+# Copy to C:\Program Files\Winlogbeat\winlogbeat.yml in the lab VM.
+# Replace the host with your VMnet1 address and the key with WINLOGBEAT_API_KEY
+# from .env. Never commit a real key.
+winlogbeat.event_logs:
+  - name: Microsoft-Windows-Sysmon/Operational
+  - name: Microsoft-Windows-PowerShell/Operational
+    event_id: 4103, 4104
+  - name: Security
+  - name: System
+
+output.elasticsearch:
+  hosts: ["http://192.168.88.1:9200"]
+  api_key: "PASTE_ID:PASTE_KEY"
+
+logging.level: info

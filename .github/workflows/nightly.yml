@@ -1,0 +1,39 @@
+name: RuleForge nightly
+on:
+  schedule: [{ cron: "17 7 * * *" }]   # daily, 07:17 UTC
+  workflow_dispatch:
+permissions: { contents: read, pages: write, id-token: write }
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      elasticsearch:
+        image: docker.elastic.co/elasticsearch/elasticsearch:9.2.4
+        env: { discovery.type: single-node, xpack.security.enabled: "false", ES_JAVA_OPTS: "-Xms2g -Xmx2g" }
+        ports: ["9200:9200"]
+        options: >-
+          --health-cmd "curl -s http://localhost:9200/_cluster/health | grep -qE 'green|yellow'"
+          --health-interval 10s --health-retries 30
+    env:
+      ES_URL: http://localhost:9200
+      PAGES_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -r requirements.txt
+      - run: python tools/load_datasets.py
+      - run: python tools/evaluate.py --out results/metrics.json
+      - run: python tools/coverage.py results/metrics.json --out results/coverage_layer.json
+      - run: python tools/convert.py --out results/converted
+      - run: python tools/build_site.py
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.pages.outputs.page_url }}" }
+    steps:
+      - id: pages
+        uses: actions/deploy-pages@v4

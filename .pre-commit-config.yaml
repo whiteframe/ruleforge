@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruleforge-lint
+        name: RuleForge lint
+        entry: .venv/bin/python tools/lint_rules.py
+        language: system
+        pass_filenames: false
+        files: ^rules/

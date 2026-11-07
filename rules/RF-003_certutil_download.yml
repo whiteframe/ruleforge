@@ -1,0 +1,33 @@
+title: Certutil Used to Download a File
+id: 55d2ed54-da21-471d-85a7-917dc4f49a62
+status: experimental
+description: Detects certutil.exe using urlcache or verifyctl to fetch a remote file.
+references:
+  - https://attack.mitre.org/techniques/T1105/
+author: Your Name
+date: 2026-11-07
+tags:
+  - attack.command-and-control
+  - attack.t1105
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_img:
+    - Image|endswith: '\certutil.exe'
+    - OriginalFileName: 'CertUtil.exe'
+  selection_cli:
+    CommandLine|contains:
+      - 'urlcache'
+      - 'verifyctl'
+  selection_url:
+    CommandLine|contains:
+      - 'http://'
+      - 'https://'
+  condition: all of selection_*
+falsepositives:
+  - Administrators downloading certificate revocation lists by hand
+level: high
+ruleforge:
+  id: RF-003
+  fixtures: tests/fixtures/RF-003

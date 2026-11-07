@@ -1,0 +1,2 @@
+{"Image": "C:\\Windows\\System32\\certutil.exe", "OriginalFileName": "CertUtil.exe",
+ "CommandLine": "certutil.exe -hashfile C:\\Temp\\setup.exe SHA256"}

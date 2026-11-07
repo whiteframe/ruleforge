@@ -18,12 +18,20 @@ services:
   setup:
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     depends_on: { es: { condition: service_healthy } }
-    command: >
-      bash -c '
-        until curl -s -X POST -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json"
-        http://es:9200/_security/user/kibana_system/_password
-        -d "{\"password\":\"251awousa1\"}" | grep -q "^{}"; do sleep 5; done;
-        echo kibana_system password set'
+    environment:
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
+    command:
+      - bash
+      - -c
+      - |
+        for i in $$(seq 1 60); do
+          reply=$$(curl -s -X POST -u "elastic:$$ELASTIC_PASSWORD" -H "Content-Type: application/json" -d "{\"password\":\"$$KIBANA_PASSWORD\"}" http://es:9200/_security/user/kibana_system/_password)
+          echo "attempt $$i: $$reply"
+          if [ "$$reply" = "{}" ]; then echo "kibana_system password set"; exit 0; fi
+          sleep 5
+        done
+        echo "gave up after 5 minutes"; exit 1
 
   kibana:
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
