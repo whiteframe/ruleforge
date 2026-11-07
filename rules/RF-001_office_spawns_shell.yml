@@ -1,0 +1,54 @@
+title: Office Application Spawns a Shell or Script Host
+id: c664ece9-805f-4a16-85d4-9e86fc767804
+status: experimental
+description: >-
+  Detects a Microsoft Office application starting a command shell, PowerShell, or a
+  Windows script host. Malicious documents commonly use this to run their first-stage payload.
+references:
+  - https://attack.mitre.org/techniques/T1204/002/
+  - https://attack.mitre.org/techniques/T1566/001/
+author: Your Name
+date: 2026-11-07
+tags:
+  - attack.execution
+  - attack.t1204.002
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_parent:
+    ParentImage|endswith:
+      - '\WINWORD.EXE'
+      - '\EXCEL.EXE'
+      - '\POWERPNT.EXE'
+      - '\OUTLOOK.EXE'
+      - '\MSACCESS.EXE'
+      - '\MSPUB.EXE'
+      - '\ONENOTE.EXE'
+  selection_child:
+    - Image|endswith:
+        - '\cmd.exe'
+        - '\powershell.exe'
+        - '\pwsh.exe'
+        - '\wscript.exe'
+        - '\cscript.exe'
+        - '\mshta.exe'
+        - '\rundll32.exe'
+        - '\regsvr32.exe'
+    - OriginalFileName:
+        - 'Cmd.Exe'
+        - 'PowerShell.EXE'
+        - 'pwsh.dll'
+        - 'wscript.exe'
+        - 'cscript.exe'
+        - 'MSHTA.EXE'
+        - 'RUNDLL32.EXE'
+        - 'REGSVR32.EXE'
+  condition: all of selection_*
+falsepositives:
+  - Office add-ins or macros used by finance and IT teams that call scripts on purpose
+  - Opening links from Outlook that launch a script host (rare)
+level: high
+ruleforge:
+  id: RF-001
+  fixtures: tests/fixtures/RF-001

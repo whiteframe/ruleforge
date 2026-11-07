@@ -1,0 +1,6 @@
+{
+  "SourceImage": "C:\\Users\\Public\\procdump64.exe",
+  "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+  "GrantedAccess": "0x1fffff",
+  "CallTrace": "C:\\Windows\\SYSTEM32\\ntdll.dll+9d4c4"
+}

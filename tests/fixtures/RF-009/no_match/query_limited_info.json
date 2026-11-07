@@ -1,0 +1,5 @@
+{
+  "SourceImage": "C:\\Program Files\\SomeVendor\\agent.exe",
+  "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+  "GrantedAccess": "0x1000"
+}

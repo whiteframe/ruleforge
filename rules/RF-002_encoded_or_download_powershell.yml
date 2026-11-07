@@ -1,0 +1,50 @@
+title: PowerShell With Encoded Command or Download Cradle
+id: 5558d210-7e6f-4a5f-a807-b2b181a2796e
+status: experimental
+description: >-
+  Detects PowerShell started with a base64-encoded command, or with a command line that
+  downloads content from the internet. Both are common first steps for malware.
+references:
+  - https://attack.mitre.org/techniques/T1059/001/
+author: Your Name
+date: 2026-11-07
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.command-and-control
+  - attack.t1105
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_img:
+    - Image|endswith:
+        - '\powershell.exe'
+        - '\pwsh.exe'
+    - OriginalFileName:
+        - 'PowerShell.EXE'
+        - 'pwsh.dll'
+  selection_encoded:
+    CommandLine|contains:
+      - ' -enc '
+      - ' -encodedcommand '
+      - ' -ec '
+      - ' /enc '
+      - ' /encodedcommand '
+  selection_cradle:
+    CommandLine|contains:
+      - 'DownloadString('
+      - 'DownloadFile('
+      - 'DownloadData('
+      - 'Net.WebClient'
+      - 'Invoke-WebRequest'
+      - 'Invoke-RestMethod'
+      - 'Start-BitsTransfer'
+  condition: selection_img and (selection_encoded or selection_cradle)
+falsepositives:
+  - Software deployment and management tools that run encoded PowerShell (SCCM, some RMM agents)
+  - Administrators downloading tools with Invoke-WebRequest
+level: medium
+ruleforge:
+  id: RF-002
+  fixtures: tests/fixtures/RF-002

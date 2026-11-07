@@ -1,0 +1,61 @@
+title: Suspicious Registry Run Key Persistence
+id: 5d21d1e2-8926-4098-b5c5-165416ec82fc
+status: experimental
+description: >-
+  Detects a value written under a Run or RunOnce key that points to a user-writable
+  folder or a script host, or that was written by a shell or script host. Malware uses
+  Run keys to start again at every logon.
+references:
+  - https://attack.mitre.org/techniques/T1547/001/
+author: Your Name
+date: 2026-11-07
+tags:
+  - attack.persistence
+  - attack.privilege-escalation
+  - attack.t1547.001
+logsource:
+  category: registry_set
+  product: windows
+detection:
+  selection_key:
+    TargetObject|contains:
+      - '\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\'
+      - '\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce\'
+      - '\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Run\'
+  selection_suspicious_value:
+    Details|contains:
+      - '\AppData\Roaming\'
+      - '\AppData\Local\Temp\'
+      - '\Windows\Temp\'
+      - '\Users\Public\'
+      - 'powershell'
+      - 'pwsh'
+      - 'cmd.exe /c'
+      - 'cmd /c'
+      - 'mshta'
+      - 'wscript'
+      - 'cscript'
+      - 'rundll32'
+      - 'regsvr32'
+  selection_suspicious_writer:
+    Image|endswith:
+      - '\reg.exe'
+      - '\powershell.exe'
+      - '\pwsh.exe'
+      - '\cmd.exe'
+      - '\wscript.exe'
+      - '\cscript.exe'
+      - '\mshta.exe'
+  # OneDrive and Teams register themselves under AppData at every install and update
+  filter_onedrive:
+    Details|contains: '\AppData\Local\Microsoft\OneDrive\'
+  filter_teams:
+    Details|contains: '\AppData\Local\Microsoft\Teams\'
+  condition: selection_key and (selection_suspicious_value or selection_suspicious_writer) and not 1 of filter_*
+falsepositives:
+  - Per-user applications that install under AppData (Discord, Spotify, Zoom); add filters as the benign baseline finds them
+  - Administrators adding Run keys with reg.exe during setup
+level: medium
+ruleforge:
+  id: RF-007
+  fixtures: tests/fixtures/RF-007

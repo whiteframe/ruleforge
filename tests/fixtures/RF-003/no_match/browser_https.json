@@ -1,2 +1,5 @@
-{"Image": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", "OriginalFileName": "msedge.exe",
- "CommandLine": "msedge.exe --single-argument https://example.org/download?file=urlcache.txt"}
+{
+  "Image": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "OriginalFileName": "msedge.exe",
+  "CommandLine": "msedge.exe --single-argument https://example.org/download?file=urlcache.txt"
+}

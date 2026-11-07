@@ -1,0 +1,5 @@
+{
+  "SourceImage": "C:\\AtomicRedTeam\\ExternalPayloads\\x64\\mimikatz.exe",
+  "TargetImage": "C:\\Windows\\System32\\lsass.exe",
+  "GrantedAccess": "0x1010"
+}

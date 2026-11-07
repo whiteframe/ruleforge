@@ -1,0 +1,6 @@
+{
+  "Image": "C:\\Users\\Public\\ps.exe",
+  "OriginalFileName": "PowerShell.EXE",
+  "CommandLine": "ps.exe -nop -c Get-Date",
+  "ParentImage": "C:\\Program Files\\Microsoft Office\\root\\Office16\\EXCEL.EXE"
+}

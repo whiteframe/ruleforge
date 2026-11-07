@@ -1,0 +1,50 @@
+title: Suspicious Access to LSASS Memory
+id: 12599654-18e7-4d4f-aff4-5df2dee6ce97
+status: experimental
+description: >-
+  Detects a process opening lsass.exe with access rights that allow reading its memory,
+  which is how tools such as Mimikatz, ProcDump, and comsvcs.dll MiniDump steal credentials.
+references:
+  - https://attack.mitre.org/techniques/T1003/001/
+author: Your Name
+date: 2026-11-07
+tags:
+  - attack.credential-access
+  - attack.t1003.001
+logsource:
+  category: process_access
+  product: windows
+detection:
+  selection_target:
+    TargetImage|endswith: '\lsass.exe'
+  selection_access:
+    GrantedAccess:
+      - '0x1010'
+      - '0x1038'
+      - '0x1410'
+      - '0x1438'
+      - '0x143a'
+      - '0x1fffff'
+      - '0x1f3fff'
+  # Microsoft Defender scans lsass as part of normal protection
+  filter_defender:
+    SourceImage|startswith:
+      - 'C:\ProgramData\Microsoft\Windows Defender\Platform\'
+      - 'C:\Program Files\Windows Defender\'
+  # Core Windows processes that open lsass during normal operation
+  filter_system:
+    SourceImage:
+      - 'C:\Windows\System32\wininit.exe'
+      - 'C:\Windows\System32\csrss.exe'
+      - 'C:\Windows\System32\services.exe'
+      - 'C:\Windows\System32\svchost.exe'
+      - 'C:\Windows\System32\wbem\WmiPrvSE.exe'
+      - 'C:\Windows\System32\lsm.exe'
+  condition: all of selection_* and not 1 of filter_*
+falsepositives:
+  - Other security and backup products that read lsass memory; add them to a filter after confirming
+  - Windows Error Reporting (WerFault.exe) when lsass crashes
+level: high
+ruleforge:
+  id: RF-009
+  fixtures: tests/fixtures/RF-009

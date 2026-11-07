@@ -1,0 +1,6 @@
+{
+  "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "OriginalFileName": "PowerShell.EXE",
+  "CommandLine": "powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAKQA=",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}

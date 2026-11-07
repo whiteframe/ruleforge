@@ -1,0 +1,6 @@
+{
+  "EventType": "SetValue",
+  "Image": "C:\\Windows\\Temp\\setup\\installer.exe",
+  "TargetObject": "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\SecurityHealth",
+  "Details": "C:\\Program Files\\Vendor\\agent.exe"
+}

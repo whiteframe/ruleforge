@@ -1,5 +1,5 @@
 title: Certutil Used to Download a File
-id: 55d2ed54-da21-471d-85a7-917dc4f49a62
+id: c6e269c1-4fa5-487c-895e-1e177722e81c
 status: experimental
 description: Detects certutil.exe using urlcache or verifyctl to fetch a remote file.
 references:

